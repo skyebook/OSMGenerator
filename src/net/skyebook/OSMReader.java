@@ -71,41 +71,43 @@ public class OSMReader {
 			String[] attributes = line.split("=\"");
 			for(int i=0; i<attributes.length; i++){
 				String attr=attributes[i];
-				if(attr.endsWith("id")){
+				if(attr.endsWith(" id")){
+					//System.out.println(attributes[i]);
+					//System.out.println(attributes[i+1]);
 					node.setId(Long.parseLong(getNextAttributeValue(attributes[i+1])));
 				}
-				else if(attr.endsWith("lat")){
+				else if(attr.endsWith(" lat")){
 					lat = Double.parseDouble(getNextAttributeValue(attributes[i+1]));
 					if(lon!=-1){
 						node.setLocation(new GPSCoordinate(0, lat, lon));
 					}
 				}
-				else if(attr.endsWith("lon")){
+				else if(attr.endsWith(" lon")){
 					lon = Double.parseDouble(getNextAttributeValue(attributes[i+1]));
 					if(lat!=-1){
 						node.setLocation(new GPSCoordinate(0, lat, lon));
 					}
 				}
-				else if(attr.endsWith("user")){
+				else if(attr.endsWith(" user")){
 					// Will implement this later if the need arises
 				}
-				else if(attr.endsWith("uid")){
+				else if(attr.endsWith(" uid")){
 					// Will implement this later if the need arises
 				}
-				else if(attr.endsWith("visible")){
+				else if(attr.endsWith(" visible")){
 					// Will implement this later if the need arises
 				}
-				else if(attr.endsWith("version")){
+				else if(attr.endsWith(" version")){
 					// Will implement this later if the need arises
 				}
-				else if(attr.endsWith("changeset")){
+				else if(attr.endsWith(" changeset")){
 					// Will implement this later if the need arises
 				}
-				else if(attr.endsWith("timestamp")){
+				else if(attr.endsWith(" timestamp")){
 					// Will implement this later if the need arises
 				}
 			}
-			//System.out.println(node.getId()+" "+node.getLocation().toString());
+			System.out.println(node.getId()+" "+node.getLocation().toString());
 
 			// move forward until the node is complete
 			if(!isLineSelfContained(line)){
