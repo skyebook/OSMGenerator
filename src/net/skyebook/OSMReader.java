@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
 
+import net.skyebook.RelationLink.Type;
+
 import edu.poly.bxmc.betaville.jme.map.GPSCoordinate;
 import edu.poly.bxmc.betaville.osm.Node;
+import edu.poly.bxmc.betaville.osm.Relation;
 
 /**
  * @author Skye Book
@@ -28,13 +31,14 @@ public class OSMReader {
 	private static final String relationPrefix = "<relation";
 	private static final String tagPrefix = "<tag";
 	private static final String nodeReferencePrefix = "<nd";
+	private static final String memberReferencePrefix = "<member";
 	
 	// line suffixes
 	private static final String nodeSuffix = "</node";
 	private static final String waySuffix = "</way";
 	private static final String relationSuffix = "</relation";
 	private static final String tagSuffix = "</tag";
-	private static final String nodeReferenceSuffix = "</nd";
+	private static final String memberReferenceSuffix = "</member";
 	
 	private boolean relationsHaveBeenProcessed = false;
 	private boolean waysHaveBeenProcessed = false;
@@ -43,9 +47,29 @@ public class OSMReader {
 		GZIPInputStream is = new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/new-york.osm.gz"));
 		br = new BufferedReader(new InputStreamReader(is));
 		long start = System.currentTimeMillis();
+		
+		// read all of the relations
 		while(br.ready()){
 			readLine(br.readLine());
 		}
+		
+		relationsHaveBeenProcessed=true;
+		System.out.println("Relations Processed in " + (System.currentTimeMillis()-start) + "ms");
+		br = new BufferedReader(new InputStreamReader(is));
+		
+		// read all of the ways
+		while(br.ready()){
+			readLine(br.readLine());
+		}
+		
+		waysHaveBeenProcessed=true;
+		br = new BufferedReader(new InputStreamReader(is));
+		
+		// now process the nodes
+		while(br.ready()){
+			readLine(br.readLine());
+		}
+		
 		System.out.println("Read Took " + (System.currentTimeMillis()-start));
 	}
 	
@@ -63,12 +87,12 @@ public class OSMReader {
 		totalBytesRead+=line.length();
 		
 		// what type of element is this?
-		if(line.contains(nodePrefix)){
+		if(waysHaveBeenProcessed && relationsHaveBeenProcessed && line.contains(nodePrefix)){
 			Node node = new Node();
 			double lat = -1;
 			double lon = -1;
 			// get the information
-			String[] attributes = line.split("=\"");
+			String[] attributes = getAttributes(line);
 			for(int i=0; i<attributes.length; i++){
 				String attr=attributes[i];
 				if(attr.endsWith(" id")){
@@ -118,11 +142,55 @@ public class OSMReader {
 				}
 			}
 		}
-		else if(line.contains(wayPrefix)){
+		else if(relationsHaveBeenProcessed && !waysHaveBeenProcessed && line.contains(wayPrefix)){
 			
 		}
-		else if(line.contains(relationPrefix)){
+		else if(!relationsHaveBeenProcessed && line.contains(relationPrefix)){
+			Relation relation = new Relation();
+			String[] attributes = getAttributes(line);
+			for(int i=0; i<attributes.length; i++){
+				String attr=attributes[i];
+				if(attr.endsWith(" id")){
+					// get the relation id
+					relation.setId(Long.parseLong(getNextAttributeValue(attributes[i+1])));
+				}
+			}
 			
+			// move forward until the node is complete
+			if(!isLineSelfContained(line)){
+				String subLine = "";
+				while(br.ready() && !subLine.contains(relationSuffix)){
+					subLine = br.readLine();
+					if(subLine.startsWith(nodeReferencePrefix)){
+						
+					}
+					else if(subLine.startsWith(tagPrefix)){
+						
+					}
+					else if(subLine.startsWith(memberReferencePrefix)){
+						RelationLink link = new RelationLink();
+						String[] subLineAttributes = getAttributes(subLine);
+						for(int i=0; i<subLineAttributes.length; i++){
+							String attr=subLineAttributes[i];
+							if(attr.endsWith(" type")){
+								String type = getNextAttributeValue(subLineAttributes[i+1]).toLowerCase();
+								link.setType(Type.valueOf(type));
+							}
+							else if(attr.endsWith(" ref")){
+								link.setId(Long.parseLong(getNextAttributeValue(subLineAttributes[i+1])));
+							}
+							else if(attr.endsWith(" role")){
+								// we should get around to caring about this at some point
+							}
+						}
+					}
+					else{
+						System.out.println("Unknown prefix found: " + subLine);
+					}
+				}
+			}
+			// grab the nodes
+			// is this something we want? (search for tags)
 		}
 		else if(line.contains(tagPrefix)){
 			
@@ -130,6 +198,10 @@ public class OSMReader {
 		else if(line.contains(nodeReferencePrefix)){
 			
 		}
+	}
+	
+	private String[] getAttributes(String line){
+		return line.split("=\"");
 	}
 	
 	private String getNextAttributeValue(String nextToken){
