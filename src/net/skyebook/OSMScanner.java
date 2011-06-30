@@ -50,12 +50,12 @@ public class OSMScanner {
 
 	private boolean relationsHaveBeenProcessed = false;
 	private boolean waysHaveBeenProcessed = false;
-	
+
 	private ExecutorService threadPool = Executors.newFixedThreadPool(1);
 
 	private ArrayList<DBActions> pool = new ArrayList<DBActions>();
 	private int connectionCount=4;
-	
+
 	private boolean isMemoryAvailable(){
 		return (float)Runtime.getRuntime().freeMemory()/(float)Runtime.getRuntime().maxMemory() < .75f;
 	}
@@ -69,7 +69,7 @@ public class OSMScanner {
 				if(!dba.isBusy()) return dba;
 			}
 		}
-		*/
+		 */
 	}
 
 	public void read() throws FileNotFoundException, IOException, NumberFormatException, InstantiationException, IllegalAccessException{
@@ -78,7 +78,7 @@ public class OSMScanner {
 			pool.add(new DBActions("root", "root", "osm"));
 		}
 
-		br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/new-york.osm.gz"))));
+		br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/map.osm.gz"))));
 		long start = System.currentTimeMillis();
 
 		// read all of the relations
@@ -86,11 +86,11 @@ public class OSMScanner {
 			readLine(br.readLine());
 		}
 
-		
+
 		/*
 		relationsHaveBeenProcessed=true;
 		System.out.println("Relations Processed in " + (System.currentTimeMillis()-start) + "ms");
-		
+
 		br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/new-york.osm.gz"))));
 
 		// read all of the ways
@@ -114,7 +114,7 @@ public class OSMScanner {
 		while(br.ready()){
 			readLine(br.readLine());
 		}
-		*/
+		 */
 		System.out.println("Read Took " + (System.currentTimeMillis()-start));
 	}
 
@@ -182,7 +182,7 @@ public class OSMScanner {
 			if(!isLineSelfContained(line)){
 				String subLine = "";
 				while(br.ready()){
-					subLine = br.readLine();
+					subLine = br.readLine().trim();
 					// we are done with this node
 					if(subLine.contains(nodeSuffix)) break;
 
@@ -193,11 +193,16 @@ public class OSMScanner {
 						for(int i=0; i<subLineAttributes.length; i++){
 							String attr=subLineAttributes[i];
 							if(attr.endsWith(" k")){
-								Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
-								if(c!=null){
-									tag = c.newInstance();
-									if(value!=null) tag.setValue(value);
+								// Apparently not all keys are included!
+								//Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
+								long stamp = System.currentTimeMillis();
+								if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
+									System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 								}
+								System.out.println("Key Match took " + (System.currentTimeMillis()-stamp));
+								tag = new AbstractTag();
+								tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
+								if(value!=null) tag.setValue(value);
 							}
 							else if(attr.endsWith(" v")){
 								value = getNextAttributeValue(subLineAttributes[i+1]);
@@ -248,22 +253,26 @@ public class OSMScanner {
 			if(!isLineSelfContained(line)){
 				String subLine = "";
 				while(br.ready()){
-					subLine = br.readLine();
+					subLine = br.readLine().trim();
 					// we are done with this way
 					if(subLine.contains(waySuffix)) break;
 
 					if(subLine.startsWith(tagPrefix)){
+						System.out.println("tag found");
 						String[] subLineAttributes = getAttributes(subLine);
 						AbstractTag tag = null;
 						String value = null;
 						for(int i=0; i<subLineAttributes.length; i++){
 							String attr=subLineAttributes[i];
 							if(attr.endsWith(" k")){
-								Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
-								if(c!=null){
-									tag = c.newInstance();
-									if(value!=null) tag.setValue(value);
+								// Apparently not all keys are included!
+								//Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
+								if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
+									System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 								}
+								tag = new AbstractTag();
+								tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
+								if(value!=null) tag.setValue(value);
 							}
 							else if(attr.endsWith(" v")){
 								value = getNextAttributeValue(subLineAttributes[i+1]);
@@ -339,11 +348,14 @@ public class OSMScanner {
 					for(int i=0; i<subLineAttributes.length; i++){
 						String attr=subLineAttributes[i];
 						if(attr.endsWith(" k")){
-							Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
-							if(c!=null){
-								tag = c.newInstance();
-								if(value!=null) tag.setValue(value);
+							// Apparently not all keys are included!
+							//Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
+							if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
+								System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 							}
+							tag = new AbstractTag();
+							tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
+							if(value!=null) tag.setValue(value);
 						}
 						else if(attr.endsWith(" v")){
 							value = getNextAttributeValue(subLineAttributes[i+1]);
@@ -387,9 +399,9 @@ public class OSMScanner {
 
 		return relation;
 	}
-	
+
 	private void addNode(final Node node){
-		
+
 		try {
 			getConnection().addNode(node);
 		} catch (SQLException e) {
@@ -398,7 +410,7 @@ public class OSMScanner {
 		}
 		/*
 		threadPool.submit(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -409,11 +421,11 @@ public class OSMScanner {
 				}
 			}
 		});
-		*/
+		 */
 	}
-	
+
 	private void addWay(final ShallowWay way){
-		
+
 		try {
 			getConnection().addWay(way);
 		} catch (SQLException e) {
@@ -422,7 +434,7 @@ public class OSMScanner {
 		}
 		/*
 		threadPool.submit(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -433,11 +445,11 @@ public class OSMScanner {
 				}
 			}
 		});
-		*/
+		 */
 	}
-	
+
 	private void addRelation(final Relation relation){
-		
+
 		try {
 			getConnection().addRelation(relation);
 		} catch (SQLException e) {
@@ -446,7 +458,7 @@ public class OSMScanner {
 		}
 		/*
 		threadPool.submit(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -457,7 +469,7 @@ public class OSMScanner {
 				}
 			}
 		});
-		*/
+		 */
 	}
 
 	private String[] getAttributes(String line){
