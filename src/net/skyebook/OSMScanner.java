@@ -81,7 +81,7 @@ public class OSMScanner {
 		}
 
 
-		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/home/skye/Downloads/new-york.osm.gz"))));
+		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/home/skye/new-york.osm.gz"))));
 		long start = System.currentTimeMillis();
 
 
