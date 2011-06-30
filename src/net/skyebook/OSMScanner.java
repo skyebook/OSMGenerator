@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +32,7 @@ import edu.poly.bxmc.betaville.osm.tag.AbstractTag;
 public class OSMScanner {
 
 	private long totalBytesRead = 0;
-	private BufferedReader br;
+	private LineNumberReader br;
 
 	// line prefixes
 	private static final String nodePrefix = "<node";
@@ -50,6 +51,7 @@ public class OSMScanner {
 
 	private boolean relationsHaveBeenProcessed = false;
 	private boolean waysHaveBeenProcessed = false;
+	private boolean nodesHaveBeenProcessed = false;
 
 	private ExecutorService threadPool = Executors.newFixedThreadPool(1);
 
@@ -78,10 +80,24 @@ public class OSMScanner {
 			pool.add(new DBActions("root", "root", "osm"));
 		}
 
-		br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/map.osm.gz"))));
+
+		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/map.osm.gz"))));
 		long start = System.currentTimeMillis();
 
-		// read all of the relations
+
+		// find the start of the ways
+		while(br.ready()){
+			while(lineStartsNode(br.readLine().trim())){}
+			while(lineStartsWay(br.readLine().trim())){}
+			while(lineStartsRelation(br.readLine().trim())){}
+		}
+
+		// find the start of the relations
+
+		// go back to the beginning
+		br.setLineNumber(0);
+		
+		// read all of the nodes
 		while(br.ready()){
 			readLine(br.readLine());
 		}
@@ -120,7 +136,7 @@ public class OSMScanner {
 
 	public void readPlain() throws FileNotFoundException, IOException, NumberFormatException, InstantiationException, IllegalAccessException{
 		FileInputStream fis= new FileInputStream("/Users/skyebook/Downloads/new-york.osm.xml");
-		br = new BufferedReader(new InputStreamReader(fis));
+		br = new LineNumberReader(new InputStreamReader(fis));
 		long start = System.currentTimeMillis();
 		while(br.ready()){
 			readLine(br.readLine());
@@ -386,7 +402,7 @@ public class OSMScanner {
 					}
 					relation.addMemeber(new RelationMemeber(link, role));
 				}
-				else if(subLine.startsWith(relationPrefix)){
+				else if(lineStartsRelation(subLine)){
 					relation.addMemeber(new RelationMemeber(createRelation(subLine), ""));
 				}
 				else{
@@ -478,6 +494,18 @@ public class OSMScanner {
 
 	private String getNextAttributeValue(String nextToken){
 		return nextToken.substring(0, nextToken.indexOf("\""));
+	}
+
+	private boolean lineStartsNode(String line){
+		return line.startsWith(nodePrefix);
+	}
+
+	private boolean lineStartsWay(String line){
+		return line.startsWith(wayPrefix);
+	}
+
+	private boolean lineStartsRelation(String line){
+		return line.startsWith(relationPrefix);
 	}
 
 	/**
