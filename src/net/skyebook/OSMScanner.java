@@ -86,6 +86,7 @@ public class OSMScanner {
 
 
 		// find the start of the ways
+		/*
 		while(br.ready()){
 			while(lineStartsNode(br.readLine().trim())){}
 			while(lineStartsWay(br.readLine().trim())){}
@@ -96,6 +97,7 @@ public class OSMScanner {
 
 		// go back to the beginning
 		br.setLineNumber(0);
+		*/
 		
 		// read all of the nodes
 		while(br.ready()){
@@ -103,34 +105,6 @@ public class OSMScanner {
 		}
 
 
-		/*
-		relationsHaveBeenProcessed=true;
-		System.out.println("Relations Processed in " + (System.currentTimeMillis()-start) + "ms");
-
-		br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/new-york.osm.gz"))));
-
-		// read all of the ways
-		while(br.ready()){
-			while(!isMemoryAvailable()){
-				System.out.println("Waiting for free memory");
-				try {
-					Thread.sleep(25);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			readLine(br.readLine());
-		}
-
-		waysHaveBeenProcessed=true;
-		br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/Users/skyebook/Downloads/new-york.osm.gz"))));
-
-		// now process the nodes
-		while(br.ready()){
-			readLine(br.readLine());
-		}
-		 */
 		System.out.println("Read Took " + (System.currentTimeMillis()-start));
 	}
 
@@ -215,7 +189,7 @@ public class OSMScanner {
 								if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
 									System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 								}
-								System.out.println("Key Match took " + (System.currentTimeMillis()-stamp));
+								//System.out.println("Key Match took " + (System.currentTimeMillis()-stamp));
 								tag = new AbstractTag();
 								tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
 								if(value!=null) tag.setValue(value);

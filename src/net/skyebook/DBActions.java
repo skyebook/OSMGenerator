@@ -153,7 +153,7 @@ public class DBActions {
 	private String createTagString(List<AbstractTag> tags){
 		// build the tag string
 		StringBuilder tagString = new StringBuilder();
-		System.out.println("there are "+tags.size()+" tags");
+		//System.out.println("there are "+tags.size()+" tags");
 		for(AbstractTag tag : tags){
 			// if this is not the first tag, add a comma to separate it from the last pair
 			if(tagString.length()>0) tagString.append(",");
