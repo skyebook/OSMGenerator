@@ -41,6 +41,8 @@ public class OSMScanner {
 	private static final String tagPrefix = "<tag";
 	private static final String nodeReferencePrefix = "<nd";
 	private static final String memberReferencePrefix = "<member";
+	private static final String changesetPrefix = "<changeset";
+	private static final String boundingBoxPrefix = "<bound box";
 
 	// line suffixes
 	private static final String nodeSuffix = "</node>";
@@ -48,10 +50,14 @@ public class OSMScanner {
 	private static final String relationSuffix = "</relation>";
 	private static final String tagSuffix = "</tag>";
 	private static final String memberReferenceSuffix = "</member>";
+	private static final String changesetSuffix = "</changeset>";
+	private static final String boundingBoxSuffix = "</bound box>";
 
 	private boolean relationsHaveBeenProcessed = false;
 	private boolean waysHaveBeenProcessed = false;
 	private boolean nodesHaveBeenProcessed = false;
+
+	private int lastWeirdTag=-1;
 
 	private ExecutorService threadPool = Executors.newFixedThreadPool(1);
 
@@ -97,8 +103,8 @@ public class OSMScanner {
 
 		// go back to the beginning
 		br.setLineNumber(0);
-		*/
-		
+		 */
+
 		// read all of the nodes
 		while(br.ready()){
 			readLine(br.readLine());
@@ -290,11 +296,33 @@ public class OSMScanner {
 			Relation relation = createRelation(line);
 			addRelation(relation);
 		}
-		else if(line.contains(tagPrefix)){
-			System.out.println("This should not have occurred (tag prefix caught at wrong level)");
+		else if(line.trim().startsWith(tagPrefix)){
+			if(lastWeirdTag+1!=br.getLineNumber()){
+				br.setLineNumber(br.getLineNumber()-2);
+				System.out.println(br.readLine());
+				System.out.println(br.readLine());
+			}
+			lastWeirdTag=br.getLineNumber();
+			System.out.println("ERROR("+br.getLineNumber()+"): "+line);
+			//System.out.println("This should not have occurred (tag prefix caught at wrong level)");
 		}
-		else if(line.contains(nodeReferencePrefix)){
+		else if(line.trim().startsWith(nodeReferencePrefix)){
 			System.out.println("This should not have occurred (node reference caught at wrong level");
+		}
+		else if(line.trim().startsWith(boundingBoxPrefix)){
+			// read through bbox
+			while(br.ready()){
+				String bbLine = br.readLine();
+				if(bbLine.contains(boundingBoxSuffix)) break;
+			}
+		}
+		else if(line.trim().startsWith(changesetPrefix)){
+			// read through changeset
+			while(br.ready()){
+				String chSetLine = br.readLine();
+				if(chSetLine.contains(changesetSuffix)) break;
+			}
+			//if(br.getLineNumber()%100000==0) System.out.println("Line " + br.getLineNumber() + " is a changeset");
 		}
 	}
 
