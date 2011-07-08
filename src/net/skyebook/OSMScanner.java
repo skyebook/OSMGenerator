@@ -130,8 +130,8 @@ public class OSMScanner {
 		// what type of element is this?
 		if(/*waysHaveBeenProcessed && relationsHaveBeenProcessed && */line.contains(nodePrefix)){
 			Node node = new Node();
-			double lat = -1;
-			double lon = -1;
+			double lat = Double.NaN;
+			double lon = Double.NaN;
 			// get the information
 			String[] attributes = getAttributes(line);
 			for(int i=0; i<attributes.length; i++){
@@ -142,14 +142,16 @@ public class OSMScanner {
 					node.setId(Long.parseLong(getNextAttributeValue(attributes[i+1])));
 				}
 				else if(attr.endsWith(" lat")){
-					lat = Double.parseDouble(getNextAttributeValue(attributes[i+1]));
-					if(lon!=-1){
+					String val = getNextAttributeValue(attributes[i+1]);
+					lat = Double.parseDouble(val);
+					if(lon!=Double.NaN){
 						node.setLocation(new GPSCoordinate(0, lat, lon));
 					}
 				}
 				else if(attr.endsWith(" lon")){
-					lon = Double.parseDouble(getNextAttributeValue(attributes[i+1]));
-					if(lat!=-1){
+					String val = getNextAttributeValue(attributes[i+1]);
+					lon = Double.parseDouble(val);
+					if(lat!=Double.NaN){
 						node.setLocation(new GPSCoordinate(0, lat, lon));
 					}
 				}
@@ -311,16 +313,21 @@ public class OSMScanner {
 		}
 		else if(line.trim().startsWith(boundingBoxPrefix)){
 			// read through bbox
-			while(br.ready()){
-				String bbLine = br.readLine();
-				if(bbLine.contains(boundingBoxSuffix)) break;
+			System.out.println("bbox");
+			if(!line.trim().endsWith("/>")){
+				while(br.ready()){
+					String bbLine = br.readLine();
+					if(bbLine.contains(boundingBoxSuffix)) break;
+				}
 			}
 		}
 		else if(line.trim().startsWith(changesetPrefix)){
 			// read through changeset
-			while(br.ready()){
-				String chSetLine = br.readLine();
-				if(chSetLine.contains(changesetSuffix)) break;
+			if(!line.trim().endsWith("/>")){
+				while(br.ready()){
+					String chSetLine = br.readLine();
+					if(chSetLine.contains(changesetSuffix)) break;
+				}
 			}
 			//if(br.getLineNumber()%100000==0) System.out.println("Line " + br.getLineNumber() + " is a changeset");
 		}
@@ -495,7 +502,11 @@ public class OSMScanner {
 	}
 
 	private String getNextAttributeValue(String nextToken){
+		try{
 		return nextToken.substring(0, nextToken.indexOf("\""));
+		}catch(StringIndexOutOfBoundsException e){
+			return " ";
+		}
 	}
 
 	private boolean lineStartsNode(String line){
