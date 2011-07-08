@@ -81,7 +81,7 @@ public class OSMScanner {
 		}
 
 
-		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/home/skye/new-york.osm.gz"))));
+		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/home/skye/planet-110615.osm.gz"))));
 		long start = System.currentTimeMillis();
 
 
@@ -291,7 +291,7 @@ public class OSMScanner {
 			addRelation(relation);
 		}
 		else if(line.contains(tagPrefix)){
-			System.out.println("This should not have occurred (tag prefix caught at wrong level");
+			System.out.println("This should not have occurred (tag prefix caught at wrong level)");
 		}
 		else if(line.contains(nodeReferencePrefix)){
 			System.out.println("This should not have occurred (node reference caught at wrong level");
