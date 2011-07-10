@@ -3,7 +3,6 @@
  */
 package net.skyebook;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,7 +21,6 @@ import edu.poly.bxmc.betaville.osm.KeyMatcher;
 import edu.poly.bxmc.betaville.osm.Node;
 import edu.poly.bxmc.betaville.osm.Relation;
 import edu.poly.bxmc.betaville.osm.RelationMemeber;
-import edu.poly.bxmc.betaville.osm.Way;
 import edu.poly.bxmc.betaville.osm.tag.AbstractTag;
 
 /**
@@ -193,11 +191,9 @@ public class OSMScanner {
 							if(attr.endsWith(" k")){
 								// Apparently not all keys are included!
 								//Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
-								long stamp = System.currentTimeMillis();
 								if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
 									System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 								}
-								//System.out.println("Key Match took " + (System.currentTimeMillis()-stamp));
 								tag = new AbstractTag();
 								tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
 								if(value!=null) tag.setValue(value);
@@ -256,7 +252,6 @@ public class OSMScanner {
 					if(subLine.contains(waySuffix)) break;
 
 					if(subLine.startsWith(tagPrefix)){
-						System.out.println("tag found");
 						String[] subLineAttributes = getAttributes(subLine);
 						AbstractTag tag = null;
 						String value = null;
