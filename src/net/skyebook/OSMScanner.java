@@ -54,6 +54,12 @@ public class OSMScanner {
 	private boolean relationsHaveBeenProcessed = false;
 	private boolean waysHaveBeenProcessed = false;
 	private boolean nodesHaveBeenProcessed = false;
+	
+	// consider this a checkpoint that can be used to run the scanner back to a position before starting
+	private boolean reachedFirstWay = false;
+	private boolean reachedFirstRelation = false;
+	
+	private boolean goStraightToRelations = true;
 
 	private int lastWeirdTag=-1;
 
@@ -127,6 +133,7 @@ public class OSMScanner {
 
 		// what type of element is this?
 		if(/*waysHaveBeenProcessed && relationsHaveBeenProcessed && */line.contains(nodePrefix)){
+			if(!reachedFirstRelation && goStraightToRelations) return;
 			Node node = new Node();
 			double lat = Double.NaN;
 			double lon = Double.NaN;
@@ -212,6 +219,8 @@ public class OSMScanner {
 			addNode(node);
 		}
 		else if(/*relationsHaveBeenProcessed && !waysHaveBeenProcessed && */line.contains(wayPrefix)){
+			if(!reachedFirstWay) reachedFirstWay=true;
+			if(!reachedFirstRelation && goStraightToRelations) return;
 			ShallowWay way = new ShallowWay();
 
 
@@ -290,6 +299,7 @@ public class OSMScanner {
 			addWay(way);
 		}
 		else if(/*!relationsHaveBeenProcessed && */line.contains(relationPrefix)){
+			if(!reachedFirstRelation) reachedFirstRelation=true;
 			Relation relation = createRelation(line);
 			addRelation(relation);
 		}
