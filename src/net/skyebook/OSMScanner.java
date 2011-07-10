@@ -304,6 +304,7 @@ public class OSMScanner {
 			addRelation(relation);
 		}
 		else if(line.trim().startsWith(tagPrefix)){
+			if(goStraightToRelations && !reachedFirstRelation) return;
 			if(lastWeirdTag+1!=br.getLineNumber()){
 				br.setLineNumber(br.getLineNumber()-2);
 				System.out.println(br.readLine());
