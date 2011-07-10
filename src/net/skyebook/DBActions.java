@@ -62,8 +62,8 @@ public class DBActions {
 				insertWayNullTags = con.prepareStatement("INSERT INTO ways (id) VALUES (?)");
 				insertWayMember = con.prepareStatement("INSERT INTO way_members (way, node) VALUES (?, ?)");
 
-				insertRelation = con.prepareStatement("INSERT INTO relation (id, tags) VALUES (?, ?)");
-				insertRelationNullTags = con.prepareStatement("INSERT INTO relation (id) VALUES (?)");
+				insertRelation = con.prepareStatement("INSERT INTO relations (id, tags) VALUES (?, ?)");
+				insertRelationNullTags = con.prepareStatement("INSERT INTO relations (id) VALUES (?)");
 				insertRelationMember = con.prepareStatement("INSERT INTO relation_members (relation, way, type) VALUES (?, ?, ?)");
 
 				System.out.println("Statements Prepared");
