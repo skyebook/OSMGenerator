@@ -15,10 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.skyebook;
-
-import java.util.ArrayList;
-import java.util.List;
+package net.skyebook.osmgenerator;
 
 import edu.poly.bxmc.betaville.osm.BaseOSMObject;
 
@@ -26,23 +23,24 @@ import edu.poly.bxmc.betaville.osm.BaseOSMObject;
  * @author Skye Book
  *
  */
-public class ShallowWay extends BaseOSMObject {
+public class RelationLink extends BaseOSMObject {
 	
-	private ArrayList<Long> nodeReferences;
+	public static enum Type{node, way, relation};
+	
+	public Type type;
+	
 
 	/**
 	 * 
 	 */
-	public ShallowWay() {
-		nodeReferences = new ArrayList<Long>();
+	public RelationLink(){
 	}
 	
-	public void addNodeReference(long nodeReference){
-		nodeReferences.add(nodeReference);
+	public void setType(Type type){
+		this.type=type;
 	}
 	
-	public List<Long> getNodeReferences(){
-		return nodeReferences;
+	public Type getType(){
+		return type;
 	}
-
 }

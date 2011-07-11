@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.skyebook;
+package net.skyebook.osmgenerator;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.skyebook;
+package net.skyebook.osmgenerator;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
 
-import net.skyebook.RelationLink.Type;
+import net.skyebook.osmgenerator.RelationLink.Type;
 
 import edu.poly.bxmc.betaville.jme.map.GPSCoordinate;
 import edu.poly.bxmc.betaville.osm.KeyMatcher;
