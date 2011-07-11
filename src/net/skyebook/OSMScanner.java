@@ -315,6 +315,7 @@ public class OSMScanner {
 			//System.out.println("This should not have occurred (tag prefix caught at wrong level)");
 		}
 		else if(line.trim().startsWith(nodeReferencePrefix)){
+			if(goStraightToRelations && !reachedFirstRelation) return;
 			System.out.println("This should not have occurred (node reference caught at wrong level");
 		}
 		else if(line.trim().startsWith(boundingBoxPrefix)){
@@ -360,7 +361,7 @@ public class OSMScanner {
 			}
 		}
 
-		// move forward until the node is complete
+		// move forward until the relation is complete
 		if(!isLineSelfContained(line)){
 			String subLine = "";
 			while(br.ready()){
