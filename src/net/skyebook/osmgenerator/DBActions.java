@@ -17,14 +17,17 @@
  */
 package net.skyebook.osmgenerator;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.io.IOUtils;
+
+import com.mysql.jdbc.Statement;
 
 import edu.poly.bxmc.betaville.osm.Node;
 import edu.poly.bxmc.betaville.osm.Relation;
@@ -40,7 +43,8 @@ public class DBActions {
 	private AtomicBoolean busy = new AtomicBoolean(false);
 
 	private Connection con = null;
-	private Statement statement = null;
+
+	private static boolean runBulk = true;
 
 	private PreparedStatement insertNode;
 	private PreparedStatement insertNodeNullTags;
@@ -50,6 +54,30 @@ public class DBActions {
 	private PreparedStatement insertRelation;
 	private PreparedStatement insertRelationNullTags;
 	private PreparedStatement insertRelationMember;
+
+	private static final int bufferSizeLimit = (4096*4);
+
+	private int insertNodeBufferSize = 0;
+	private StringBuilder bulkInsertNodeBuilder;
+	private Statement bulkInsertNode;
+
+	private int insertWayBufferSize = 0;
+	private StringBuilder bulkInsertWayBuilder;
+	private Statement bulkInsertWay;
+
+	private int insertWayMemberBufferSize = 0;
+	private StringBuilder bulkInsertWayMemberBuilder;
+	private Statement bulkInsertWayMember;
+
+	private int insertRelationBufferSize = 0;
+	private StringBuilder bulkInsertRelationBuilder;
+	private Statement bulkInsertRelation;
+
+	private int insertRelationMemberBufferSize = 0;
+	private StringBuilder bulkInsertRelationMemberBuilder;
+	private Statement bulkInsertRleationMember;
+
+	private static final String BULK_DELIMITER = "$,$";
 
 
 
@@ -65,8 +93,6 @@ public class DBActions {
 						pass,
 						pass);
 
-				statement = con.createStatement();
-
 				System.out.println("Preparing statements");
 
 				insertNode = con.prepareStatement("INSERT INTO nodes (id, latitude, longitude, tags) VALUES (?, ?, ?, ?)");
@@ -79,6 +105,12 @@ public class DBActions {
 				insertRelation = con.prepareStatement("INSERT INTO relations (id, tags) VALUES (?, ?)");
 				insertRelationNullTags = con.prepareStatement("INSERT INTO relations (id) VALUES (?)");
 				insertRelationMember = con.prepareStatement("INSERT INTO relation_members (relation, way, type) VALUES (?, ?, ?)");
+
+				bulkInsertNode = (Statement) con.createStatement();
+				bulkInsertWay= (Statement) con.createStatement();
+				bulkInsertWayMember= (Statement) con.createStatement();
+				bulkInsertRelation= (Statement) con.createStatement();
+				bulkInsertRleationMember= (Statement) con.createStatement();
 
 				System.out.println("Statements Prepared");
 
@@ -95,21 +127,133 @@ public class DBActions {
 			System.err.println("VendorError: " + e.getErrorCode());
 		}
 	}
+	
+	public void flushAllLoadBuffers(){
+		pushBulkNodes();
+		pushBulkWays();
+		pushBulkWayMembers();
+		pushBulkRelations();
+		pushBulkRelationMembers();
+	}
+
+	private void pushBulkNodes(){
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertNodeBuilder.toString());
+			bulkInsertNode.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertNode.setLocalInfileInputStream(is);
+
+			bulkInsertNode.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE nodes FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, latitude, longitude, tags)");
+
+			bulkInsertNode.execute("SET UNIQUE_CHECKS=1; ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void pushBulkWays(){
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertWayBuilder.toString());
+			bulkInsertWay.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertWay.setLocalInfileInputStream(is);
+
+			bulkInsertWay.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE ways FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, tags)");
+
+			bulkInsertWay.execute("SET UNIQUE_CHECKS=1; ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void pushBulkWayMembers(){
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertWayMemberBuilder.toString());
+			bulkInsertWayMember.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertWayMember.setLocalInfileInputStream(is);
+
+			bulkInsertWayMember.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_members FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (way, node)");
+
+			bulkInsertWayMember.execute("SET UNIQUE_CHECKS=1; ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void pushBulkRelations(){
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertRelationBuilder.toString());
+			bulkInsertRelation.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertRelation.setLocalInfileInputStream(is);
+
+			bulkInsertRelation.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relations FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, tags)");
+
+			bulkInsertRelation.execute("SET UNIQUE_CHECKS=1; ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void pushBulkRelationMembers(){
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertRelationMemberBuilder.toString());
+			bulkInsertRleationMember.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertRleationMember.setLocalInfileInputStream(is);
+
+			bulkInsertRleationMember.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relation_members FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (relation, way, type)");
+
+			bulkInsertRleationMember.execute("SET UNIQUE_CHECKS=1; ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public void addNode(Node node) throws SQLException{
 		busy.set(true);
-		if(node.getTags().size()==0){
-			insertNodeNullTags.setLong(1, node.getId());
-			insertNodeNullTags.setDouble(2, node.getLocation().getLatitude());
-			insertNodeNullTags.setDouble(3, node.getLocation().getLongitude());
-			insertNodeNullTags.execute();
+
+		if(runBulk){
+			// if this is the first node in this buffer create a new StringBuilder
+			if(insertNodeBufferSize==0) bulkInsertNodeBuilder = new StringBuilder();
+
+			bulkInsertNodeBuilder.append(node.getId());
+			bulkInsertNodeBuilder.append(BULK_DELIMITER);
+			bulkInsertNodeBuilder.append(node.getLocation().getLatitude());
+			bulkInsertNodeBuilder.append(BULK_DELIMITER);
+			bulkInsertNodeBuilder.append(node.getLocation().getLongitude());
+			bulkInsertNodeBuilder.append(BULK_DELIMITER);
+			bulkInsertNodeBuilder.append((node.getTags()==null)?"NULL":createTagString(node.getTags()));
+			
+			insertNodeBufferSize++;
+
+			if(insertNodeBufferSize==bufferSizeLimit){
+				// execute the insert
+				pushBulkNodes();
+
+				// reset the buffer size
+				insertNodeBufferSize=0;
+			}
+			else{
+				// if this wans't the final node in the buffer, add a newline
+				bulkInsertNodeBuilder.append("\n");
+			}
 		}
 		else{
-			insertNode.setLong(1, node.getId());
-			insertNode.setDouble(2, node.getLocation().getLatitude());
-			insertNode.setDouble(3, node.getLocation().getLongitude());
-			insertNode.setString(4, createTagString(node.getTags()));
-			insertNode.execute();
+			if(node.getTags().size()==0){
+				insertNodeNullTags.setLong(1, node.getId());
+				insertNodeNullTags.setDouble(2, node.getLocation().getLatitude());
+				insertNodeNullTags.setDouble(3, node.getLocation().getLongitude());
+				insertNodeNullTags.execute();
+			}
+			else{
+				insertNode.setLong(1, node.getId());
+				insertNode.setDouble(2, node.getLocation().getLatitude());
+				insertNode.setDouble(3, node.getLocation().getLongitude());
+				insertNode.setString(4, createTagString(node.getTags()));
+				insertNode.execute();
+			}
 		}
 
 		busy.set(false);
@@ -117,51 +261,153 @@ public class DBActions {
 
 	public void addWay(ShallowWay way) throws SQLException{
 		busy.set(true);
-		if(way.getTags().size()==0){
-			insertWayNullTags.setLong(1, way.getId());
-			insertWayNullTags.execute();
+
+		if(runBulk){
+			// if this is the first way in this buffer create a new StringBuilder
+			if(insertWayBufferSize==0) bulkInsertWayBuilder = new StringBuilder();
+
+			bulkInsertWayBuilder.append(way.getId());
+			bulkInsertWayBuilder.append(BULK_DELIMITER);
+			bulkInsertWayBuilder.append((way.getTags()==null)?"NULL":createTagString(way.getTags()));
+			
+			insertWayBufferSize++;
+
+			if(insertWayBufferSize==(bufferSizeLimit*2)){
+				// execute the insert
+				pushBulkWays();
+
+				// reset the buffer size
+				insertWayBufferSize=0;
+			}
+			else{
+				// if this wans't the final way in the buffer, add a newline
+				bulkInsertWayBuilder.append("\n");
+			}
 		}
 		else{
-			insertWay.setLong(1, way.getId());
-			insertWay.setString(2, createTagString(way.getTags()));
-			insertWay.execute();
+			if(way.getTags().size()==0){
+				insertWayNullTags.setLong(1, way.getId());
+				insertWayNullTags.execute();
+			}
+			else{
+				insertWay.setLong(1, way.getId());
+				insertWay.setString(2, createTagString(way.getTags()));
+				insertWay.execute();
+			}
 		}
-
+		
 		for(long reference : way.getNodeReferences()){
 			addWayMember(way.getId(), reference);
 		}
+
 		busy.set(false);
 	}
 
 	public void addRelation(Relation relation) throws SQLException{
 		busy.set(true);
-		if(relation.getTags().size()==0){
-			insertRelationNullTags.setLong(1, relation.getId());
-			insertRelationNullTags.execute();
+
+		if(runBulk){
+			// if this is the first relation in this buffer create a new StringBuilder
+			if(insertRelationBufferSize==0) bulkInsertRelationBuilder = new StringBuilder();
+
+			bulkInsertRelationBuilder.append(relation.getId());
+			bulkInsertRelationBuilder.append(BULK_DELIMITER);
+			bulkInsertRelationBuilder.append((relation.getTags()==null)?"NULL":createTagString(relation.getTags()));
+			
+			insertRelationBufferSize++;
+
+			if(insertRelationBufferSize==(bufferSizeLimit*2)){
+				// execute the insert
+				pushBulkRelations();
+
+				// reset the buffer size
+				insertRelationBufferSize=0;
+			}
+			else{
+				// if this wans't the final relation in the buffer, add a newline
+				bulkInsertRelationBuilder.append("\n");
+			}
 		}
 		else{
-			insertRelation.setLong(1, relation.getId());
-			insertRelation.setString(2, createTagString(relation.getTags()));
-			insertRelation.execute();
+			if(relation.getTags().size()==0){
+				insertRelationNullTags.setLong(1, relation.getId());
+				insertRelationNullTags.execute();
+			}
+			else{
+				insertRelation.setLong(1, relation.getId());
+				insertRelation.setString(2, createTagString(relation.getTags()));
+				insertRelation.execute();
+			}
 		}
-
+		
 		for(RelationMemeber rm : relation.getMemebers()){
 			addRelationMember(relation.getId(), rm);
 		}
+
 		busy.set(false);
 	}
 
 	private void addRelationMember(long relationID, RelationMemeber rm) throws SQLException{
-		insertRelationMember.setLong(1, relationID);
-		insertRelationMember.setLong(2, rm.getObjectReference().getId());
-		insertRelationMember.setString(3, rm.getRole());
-		insertRelationMember.execute();
+		if(runBulk){
+			// if this is the first relation member in this buffer create a new StringBuilder
+			if(insertRelationMemberBufferSize==0) bulkInsertRelationMemberBuilder = new StringBuilder();
+
+			bulkInsertRelationMemberBuilder.append(relationID);
+			bulkInsertRelationMemberBuilder.append(BULK_DELIMITER);
+			bulkInsertRelationMemberBuilder.append(rm.getObjectReference().getId());
+			bulkInsertRelationMemberBuilder.append(BULK_DELIMITER);
+			bulkInsertRelationMemberBuilder.append(rm.getRole());
+			
+			insertRelationMemberBufferSize++;
+
+			if(insertRelationMemberBufferSize==(bufferSizeLimit*2)){
+				// execute the insert
+				pushBulkRelationMembers();
+
+				// reset the buffer size
+				insertRelationMemberBufferSize=0;
+			}
+			else{
+				// if this wans't the final relation member in the buffer, add a newline
+				bulkInsertRelationMemberBuilder.append("\n");
+			}
+		}
+		else{
+			insertRelationMember.setLong(1, relationID);
+			insertRelationMember.setLong(2, rm.getObjectReference().getId());
+			insertRelationMember.setString(3, rm.getRole());
+			insertRelationMember.execute();
+		}
 	}
 
 	private void addWayMember(long wayID, long nodeID) throws SQLException{
-		insertWayMember.setLong(1, wayID);
-		insertWayMember.setLong(2, nodeID);
-		insertWayMember.execute();
+		if(runBulk){
+			// if this is the first way member in this buffer create a new StringBuilder
+			if(insertWayMemberBufferSize==0) bulkInsertWayMemberBuilder = new StringBuilder();
+
+			bulkInsertWayMemberBuilder.append(wayID);
+			bulkInsertWayMemberBuilder.append(BULK_DELIMITER);
+			bulkInsertWayMemberBuilder.append(nodeID);
+			
+			insertWayMemberBufferSize++;
+
+			if(insertWayMemberBufferSize==(bufferSizeLimit*2)){
+				// execute the insert
+				pushBulkWayMembers();
+
+				// reset the buffer size
+				insertWayMemberBufferSize=0;
+			}
+			else{
+				// if this wans't the final way member in the buffer, add a newline
+				bulkInsertWayMemberBuilder.append("\n");
+			}
+		}
+		else{
+			insertWayMember.setLong(1, wayID);
+			insertWayMember.setLong(2, nodeID);
+			insertWayMember.execute();
+		}
 	}
 
 	private String createTagString(List<AbstractTag> tags){
@@ -180,35 +426,6 @@ public class DBActions {
 
 	public synchronized boolean isBusy(){
 		return busy.get();
-	}
-
-	/**
-	 * Sends the SQL query to the database
-	 * 
-	 * @param query
-	 *            Query to send to the database
-	 * @return The set of results obtained after the execution of the query
-	 * @throws SQLException
-	 */
-	public ResultSet sendQuery(String query) throws SQLException {
-		return con.createStatement().executeQuery(query);
-	}
-
-	public int sendUpdate(String update) throws SQLException{
-		return statement.executeUpdate(update, Statement.RETURN_GENERATED_KEYS);
-	}
-
-	public int getLastKey(){
-		try {
-			ResultSet rs = statement.getGeneratedKeys();
-			if(rs.next()){
-				int last = rs.getInt(1);
-				return last;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return -1;
 	}
 
 	/**
