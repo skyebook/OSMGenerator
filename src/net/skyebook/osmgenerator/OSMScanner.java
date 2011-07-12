@@ -125,6 +125,7 @@ public class OSMScanner {
 
 		// read all of the nodes
 		while(br.ready()){
+			if(br.getLineNumber()%1000000==0) System.out.println("At line " + (br.getLineNumber()/1000000) + " million");
 			readLine(br.readLine());
 		}
 
@@ -137,6 +138,7 @@ public class OSMScanner {
 		br = new LineNumberReader(new InputStreamReader(fis));
 		long start = System.currentTimeMillis();
 		while(br.ready()){
+			if(br.getLineNumber()%1000000==0) System.out.println("At line " + (br.getLineNumber()/1000000) + " million");
 			readLine(br.readLine());
 		}
 		System.out.println("Read Took " + (System.currentTimeMillis()-start));
