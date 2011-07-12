@@ -70,10 +70,12 @@ public class OSMScanner {
 	private boolean nodesHaveBeenProcessed = false;
 	
 	// consider this a checkpoint that can be used to run the scanner back to a position before starting
+	
+	private boolean reachedFirstNode = false;
 	private boolean reachedFirstWay = false;
 	private boolean reachedFirstRelation = false;
 	
-	private boolean goStraightToRelations = true;
+	private boolean goStraightToRelations = false;
 
 	private int lastWeirdTag=-1;
 
@@ -149,6 +151,10 @@ public class OSMScanner {
 
 		// what type of element is this?
 		if(/*waysHaveBeenProcessed && relationsHaveBeenProcessed && */line.contains(nodePrefix)){
+			if(!reachedFirstNode){
+				reachedFirstNode=true;
+				System.out.println("First node reached at line " + br.getLineNumber());
+			}
 			if(!reachedFirstRelation && goStraightToRelations) return;
 			Node node = new Node();
 			double lat = Double.NaN;
@@ -215,7 +221,7 @@ public class OSMScanner {
 								// Apparently not all keys are included!
 								//Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
 								if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
-									System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
+									//System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 								}
 								tag = new AbstractTag();
 								tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
@@ -235,7 +241,10 @@ public class OSMScanner {
 			addNode(node);
 		}
 		else if(/*relationsHaveBeenProcessed && !waysHaveBeenProcessed && */line.contains(wayPrefix)){
-			if(!reachedFirstWay) reachedFirstWay=true;
+			if(!reachedFirstWay){
+				reachedFirstWay=true;
+				System.out.println("First way reached at line " + br.getLineNumber());
+			}
 			if(!reachedFirstRelation && goStraightToRelations) return;
 			ShallowWay way = new ShallowWay();
 
@@ -286,7 +295,7 @@ public class OSMScanner {
 								// Apparently not all keys are included!
 								//Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
 								if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
-									System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
+									//System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 								}
 								tag = new AbstractTag();
 								tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
@@ -315,7 +324,10 @@ public class OSMScanner {
 			addWay(way);
 		}
 		else if(/*!relationsHaveBeenProcessed && */line.contains(relationPrefix)){
-			if(!reachedFirstRelation) reachedFirstRelation=true;
+			if(!reachedFirstRelation){
+				reachedFirstRelation=true;
+				System.out.println("First relation reached at line " + br.getLineNumber());
+			}
 			Relation relation = createRelation(line);
 			addRelation(relation);
 		}
@@ -399,7 +411,7 @@ public class OSMScanner {
 							// Apparently not all keys are included!
 							//Class<? extends AbstractTag> c = KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]));
 							if(KeyMatcher.getKey(getNextAttributeValue(subLineAttributes[i+1]))==null){
-								System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
+								//System.out.println("Unknown Key Found: " + getNextAttributeValue(subLineAttributes[i+1]));
 							}
 							tag = new AbstractTag();
 							tag.setKey(getNextAttributeValue(subLineAttributes[i+1]));
