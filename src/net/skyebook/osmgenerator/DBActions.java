@@ -56,6 +56,7 @@ public class DBActions {
 	private PreparedStatement insertRelationMember;
 
 	private static final int bufferSizeLimit = (4096*4);
+	private static final int smallTableMultiple = 2;
 
 	private int insertNodeBufferSize = 0;
 	private StringBuilder bulkInsertNodeBuilder;
@@ -272,7 +273,7 @@ public class DBActions {
 			
 			insertWayBufferSize++;
 
-			if(insertWayBufferSize==(bufferSizeLimit*2)){
+			if(insertWayBufferSize==(bufferSizeLimit*smallTableMultiple)){
 				// execute the insert
 				pushBulkWays();
 
@@ -316,7 +317,7 @@ public class DBActions {
 			
 			insertRelationBufferSize++;
 
-			if(insertRelationBufferSize==(bufferSizeLimit*2)){
+			if(insertRelationBufferSize==(bufferSizeLimit*smallTableMultiple)){
 				// execute the insert
 				pushBulkRelations();
 
@@ -360,7 +361,7 @@ public class DBActions {
 			
 			insertRelationMemberBufferSize++;
 
-			if(insertRelationMemberBufferSize==(bufferSizeLimit*2)){
+			if(insertRelationMemberBufferSize==(bufferSizeLimit*smallTableMultiple)){
 				// execute the insert
 				pushBulkRelationMembers();
 
@@ -391,7 +392,7 @@ public class DBActions {
 			
 			insertWayMemberBufferSize++;
 
-			if(insertWayMemberBufferSize==(bufferSizeLimit*2)){
+			if(insertWayMemberBufferSize==(bufferSizeLimit*smallTableMultiple)){
 				// execute the insert
 				pushBulkWayMembers();
 
