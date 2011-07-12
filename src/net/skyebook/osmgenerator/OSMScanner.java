@@ -130,7 +130,8 @@ public class OSMScanner {
 			if(br.getLineNumber()%1000000==0) System.out.println("At line " + (br.getLineNumber()/1000000) + " million");
 			readLine(br.readLine());
 		}
-
+		
+		getConnection().flushAllLoadBuffers();
 
 		System.out.println("Read Took " + (System.currentTimeMillis()-start));
 	}
@@ -143,6 +144,9 @@ public class OSMScanner {
 			if(br.getLineNumber()%1000000==0) System.out.println("At line " + (br.getLineNumber()/1000000) + " million");
 			readLine(br.readLine());
 		}
+		
+		getConnection().flushAllLoadBuffers();
+		
 		System.out.println("Read Took " + (System.currentTimeMillis()-start));
 	}
 
