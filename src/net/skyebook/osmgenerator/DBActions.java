@@ -138,6 +138,7 @@ public class DBActions {
 	}
 
 	private void pushBulkNodes(){
+		if(bulkInsertNodeBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertNodeBuilder.toString());
 			bulkInsertNode.execute("SET UNIQUE_CHECKS=0; ");
@@ -146,6 +147,7 @@ public class DBActions {
 			bulkInsertNode.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE nodes FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, latitude, longitude, tags)");
 
 			bulkInsertNode.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertNodeBuilder = null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,6 +155,7 @@ public class DBActions {
 	}
 
 	private void pushBulkWays(){
+		if(bulkInsertWayBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertWayBuilder.toString());
 			bulkInsertWay.execute("SET UNIQUE_CHECKS=0; ");
@@ -161,6 +164,7 @@ public class DBActions {
 			bulkInsertWay.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE ways FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, tags)");
 
 			bulkInsertWay.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertWayBuilder = null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -168,6 +172,7 @@ public class DBActions {
 	}
 
 	private void pushBulkWayMembers(){
+		if(bulkInsertWayMemberBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertWayMemberBuilder.toString());
 			bulkInsertWayMember.execute("SET UNIQUE_CHECKS=0; ");
@@ -176,6 +181,7 @@ public class DBActions {
 			bulkInsertWayMember.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_members FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (way, node)");
 
 			bulkInsertWayMember.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertWayMemberBuilder=null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -183,6 +189,7 @@ public class DBActions {
 	}
 
 	private void pushBulkRelations(){
+		if(bulkInsertRelationBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertRelationBuilder.toString());
 			bulkInsertRelation.execute("SET UNIQUE_CHECKS=0; ");
@@ -191,6 +198,7 @@ public class DBActions {
 			bulkInsertRelation.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relations FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, tags)");
 
 			bulkInsertRelation.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertRelationBuilder=null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -198,6 +206,7 @@ public class DBActions {
 	}
 
 	private void pushBulkRelationMembers(){
+		if(bulkInsertRelationMemberBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertRelationMemberBuilder.toString());
 			bulkInsertRleationMember.execute("SET UNIQUE_CHECKS=0; ");
@@ -206,6 +215,7 @@ public class DBActions {
 			bulkInsertRleationMember.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relation_members FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (relation, way, type)");
 
 			bulkInsertRleationMember.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertRelationMemberBuilder=null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
