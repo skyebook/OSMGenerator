@@ -57,6 +57,10 @@ public class DBActions {
 	private int insertWayBufferSize = 0;
 	private StringBuilder bulkInsertWayBuilder;
 	private Statement bulkInsertWay;
+	
+	private int insertWayTagBufferSize = 0;
+	private StringBuilder bulkInsertWayTagBuilder;
+	private Statement bulkInsertWayTag;
 
 	private int insertWayMemberBufferSize = 0;
 	private StringBuilder bulkInsertWayMemberBuilder;
@@ -65,6 +69,10 @@ public class DBActions {
 	private int insertRelationBufferSize = 0;
 	private StringBuilder bulkInsertRelationBuilder;
 	private Statement bulkInsertRelation;
+	
+	private int insertRelationTagBufferSize = 0;
+	private StringBuilder bulkInsertRelationTagBuilder;
+	private Statement bulkInsertRelationTag;
 
 	private int insertRelationMemberBufferSize = 0;
 	private StringBuilder bulkInsertRelationMemberBuilder;
@@ -87,10 +95,13 @@ public class DBActions {
 						pass);
 
 				bulkInsertNode = (Statement) con.createStatement();
-				bulkInsertWay= (Statement) con.createStatement();
-				bulkInsertWayMember= (Statement) con.createStatement();
-				bulkInsertRelation= (Statement) con.createStatement();
-				bulkInsertRleationMember= (Statement) con.createStatement();
+				bulkInsertNodeTag = (Statement) con.createStatement();
+				bulkInsertWay = (Statement) con.createStatement();
+				bulkInsertWayTag = (Statement) con.createStatement();
+				bulkInsertWayMember = (Statement) con.createStatement();
+				bulkInsertRelation = (Statement) con.createStatement();
+				bulkInsertRelationTag = (Statement) con.createStatement();
+				bulkInsertRleationMember = (Statement) con.createStatement();
 
 				System.out.println("Statements Prepared");
 
@@ -112,26 +123,11 @@ public class DBActions {
 		pushBulkNodes();
 		pushBulkNodeTags();
 		pushBulkWays();
+		pushBulkWayTags();
 		pushBulkWayMembers();
 		pushBulkRelations();
+		pushBulkRelationTags();
 		pushBulkRelationMembers();
-	}
-
-	private void pushBulkNodeTags(){
-		if(bulkInsertNodeTagBuilder == null) return;
-		try {
-			InputStream is = IOUtils.toInputStream(bulkInsertNodeTagBuilder.toString());
-			bulkInsertNodeTag.execute("SET UNIQUE_CHECKS=0; ");
-			bulkInsertNodeTag.setLocalInfileInputStream(is);
-
-			bulkInsertNodeTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE node_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, key, value)");
-
-			bulkInsertNodeTag.execute("SET UNIQUE_CHECKS=1; ");
-			bulkInsertNodeTagBuilder = null;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	private void pushBulkNodes(){
@@ -150,6 +146,23 @@ public class DBActions {
 			e.printStackTrace();
 		}
 	}
+	
+	private void pushBulkNodeTags(){
+		if(bulkInsertNodeTagBuilder == null) return;
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertNodeTagBuilder.toString());
+			bulkInsertNodeTag.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertNodeTag.setLocalInfileInputStream(is);
+
+			bulkInsertNodeTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE node_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, key, value)");
+
+			bulkInsertNodeTag.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertNodeTagBuilder = null;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private void pushBulkWays(){
 		if(bulkInsertWayBuilder == null) return;
@@ -162,6 +175,23 @@ public class DBActions {
 
 			bulkInsertWay.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertWayBuilder = null;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void pushBulkWayTags(){
+		if(bulkInsertWayTagBuilder == null) return;
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertWayTagBuilder.toString());
+			bulkInsertWayTag.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertWayTag.setLocalInfileInputStream(is);
+
+			bulkInsertWayTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, key, value)");
+
+			bulkInsertWayTag.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertWayTagBuilder = null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -196,6 +226,23 @@ public class DBActions {
 
 			bulkInsertRelation.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertRelationBuilder=null;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void pushBulkRelationTags(){
+		if(bulkInsertRelationTagBuilder == null) return;
+		try {
+			InputStream is = IOUtils.toInputStream(bulkInsertRelationTagBuilder.toString());
+			bulkInsertRelationTag.execute("SET UNIQUE_CHECKS=0; ");
+			bulkInsertRelationTag.setLocalInfileInputStream(is);
+
+			bulkInsertRelationTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relation_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, key, value)");
+
+			bulkInsertRelationTag.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertRelationTagBuilder = null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
