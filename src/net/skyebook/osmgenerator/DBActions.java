@@ -422,6 +422,31 @@ public class DBActions {
 
 		busy.set(false);
 	}
+	
+	private void addRelationTag(long relationID, AbstractTag tag){
+
+		if(insertRelationTagBufferSize==0) bulkInsertRelationTagBuilder = new StringBuilder();
+
+		bulkInsertRelationTagBuilder.append(relationID);
+		bulkInsertRelationTagBuilder.append(BULK_DELIMITER);
+		bulkInsertRelationTagBuilder.append(tag.getKey());
+		bulkInsertRelationTagBuilder.append(BULK_DELIMITER);
+		bulkInsertRelationTagBuilder.append(tag.getValue());
+
+		insertRelationTagBufferSize++;
+
+		if(insertRelationTagBufferSize==bufferSizeLimit){
+			// execute the insert
+			pushBulkRelationTags();
+
+			// reset the buffer size
+			insertRelationTagBufferSize=0;
+		}
+		else{
+			// if this wans't the final Relation in the buffer, add a newline
+			bulkInsertRelationTagBuilder.append("\n");
+		}
+	}
 
 	private void addRelationMember(long relationID, RelationMemeber rm) throws SQLException{
 		// if this is the first relation member in this buffer create a new StringBuilder
