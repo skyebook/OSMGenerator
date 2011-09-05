@@ -356,8 +356,40 @@ public class DBActions {
 		for(long reference : way.getNodeReferences()){
 			addWayMember(way.getId(), reference);
 		}
+		
+		// do nothing if there are no tags
+		if(way.getTags()!=null){
+			for(AbstractTag tag : way.getTags()){
+				addWayTag(way.getId(), tag);
+			}
+		}
 
 		busy.set(false);
+	}
+	
+	private void addWayTag(long wayID, AbstractTag tag){
+
+		if(insertWayTagBufferSize==0) bulkInsertWayTagBuilder = new StringBuilder();
+
+		bulkInsertWayTagBuilder.append(wayID);
+		bulkInsertWayTagBuilder.append(BULK_DELIMITER);
+		bulkInsertWayTagBuilder.append(tag.getKey());
+		bulkInsertWayTagBuilder.append(BULK_DELIMITER);
+		bulkInsertWayTagBuilder.append(tag.getValue());
+
+		insertWayTagBufferSize++;
+
+		if(insertWayTagBufferSize==bufferSizeLimit){
+			// execute the insert
+			pushBulkWayTags();
+
+			// reset the buffer size
+			insertWayTagBufferSize=0;
+		}
+		else{
+			// if this wans't the final way in the buffer, add a newline
+			bulkInsertWayTagBuilder.append("\n");
+		}
 	}
 
 	public void addRelation(Relation relation) throws SQLException{
