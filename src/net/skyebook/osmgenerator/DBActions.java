@@ -154,7 +154,7 @@ public class DBActions {
 			bulkInsertNodeTag.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertNodeTag.setLocalInfileInputStream(is);
 
-			bulkInsertNodeTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE node_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, key, value)");
+			bulkInsertNodeTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE node_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, k, v)");
 
 			bulkInsertNodeTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertNodeTagBuilder = null;
@@ -188,7 +188,7 @@ public class DBActions {
 			bulkInsertWayTag.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertWayTag.setLocalInfileInputStream(is);
 
-			bulkInsertWayTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, key, value)");
+			bulkInsertWayTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, k, v)");
 
 			bulkInsertWayTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertWayTagBuilder = null;
@@ -207,7 +207,7 @@ public class DBActions {
 
 			bulkInsertWayMember.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_members FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (way, node)");
 
-			bulkInsertWayMember.execute("SET UNIQUE_CHECKS=1; ");
+			bulkInsertWayMember.execute("SET UNIQUE_CHEmysqlCKS=1; ");
 			bulkInsertWayMemberBuilder=null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -239,7 +239,7 @@ public class DBActions {
 			bulkInsertRelationTag.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertRelationTag.setLocalInfileInputStream(is);
 
-			bulkInsertRelationTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relation_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, key, value)");
+			bulkInsertRelationTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relation_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, k, v)");
 
 			bulkInsertRelationTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertRelationTagBuilder = null;
