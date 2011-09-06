@@ -107,7 +107,7 @@ public class OSMScanner {
 		}
 
 
-		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("D:\\OSM\\planet-110831\\planet-110831.osm"))));
+		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/media/Storage/OSM/planet-110831.osm.gz"))));
 		long start = System.currentTimeMillis();
 
 
@@ -486,7 +486,6 @@ public class OSMScanner {
 	}
 
 	private void addNode(final Node node){
-		System.out.println("node");
 		try {
 			getConnection().addNode(node);
 		} catch (SQLException e) {
@@ -597,8 +596,8 @@ public class OSMScanner {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, NumberFormatException, InstantiationException, IllegalAccessException{
 		OSMScanner reader = new OSMScanner();
-		//reader.read();
-		reader.readPlain();
+		reader.read();
+		//reader.readPlain();
 		System.out.println(reader.getTotalBytesRead() + " bytes read");
 	}
 
