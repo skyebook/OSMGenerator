@@ -99,8 +99,8 @@ CREATE  TABLE IF NOT EXISTS `osm`.`relation_tags` (
   `relation` BIGINT UNSIGNED NOT NULL ,
   `key` VARCHAR(255) NOT NULL ,
   `value` VARCHAR(255) NOT NULL ,
-  INDEX `fk_node_keys_1` (`relation` ASC) ,
-  CONSTRAINT `fk_node_keys_1`
+  INDEX `fk_relation_keys_1` (`relation` ASC) ,
+  CONSTRAINT `fk_relation_keys_1`
     FOREIGN KEY (`relation` )
     REFERENCES `osm`.`relations` (`id` )
     ON DELETE NO ACTION
