@@ -107,7 +107,7 @@ public class OSMScanner {
 		}
 
 
-		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/home/skye/planet-110615.osm.gz"))));
+		br = new LineNumberReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("D:\\OSM\\planet-110831\\planet-110831.osm"))));
 		long start = System.currentTimeMillis();
 
 
@@ -137,16 +137,37 @@ public class OSMScanner {
 	}
 
 	public void readPlain() throws FileNotFoundException, IOException, NumberFormatException, InstantiationException, IllegalAccessException{
-		FileInputStream fis= new FileInputStream("/Users/skyebook/Downloads/new-york.osm.xml");
-		br = new LineNumberReader(new InputStreamReader(fis));
+		for(int i=0; i<connectionCount; i++){
+			pool.add(new DBActions("root", "root", "osm"));
+		}
+
+
+		br = new LineNumberReader(new InputStreamReader(new FileInputStream("D:\\OSM\\planet-110831\\planet-110831.osm")));
 		long start = System.currentTimeMillis();
+
+
+		// find the start of the ways
+		/*
+		while(br.ready()){
+			while(lineStartsNode(br.readLine().trim())){}
+			while(lineStartsWay(br.readLine().trim())){}
+			while(lineStartsRelation(br.readLine().trim())){}
+		}
+
+		// find the start of the relations
+
+		// go back to the beginning
+		br.setLineNumber(0);
+		 */
+
+		// read all of the nodes
 		while(br.ready()){
 			if(br.getLineNumber()%1000000==0) System.out.println("At line " + (br.getLineNumber()/1000000) + " million");
 			readLine(br.readLine());
 		}
 		
 		getConnection().flushAllLoadBuffers();
-		
+
 		System.out.println("Read Took " + (System.currentTimeMillis()-start));
 	}
 
@@ -465,13 +486,14 @@ public class OSMScanner {
 	}
 
 	private void addNode(final Node node){
-
+		System.out.println("node");
 		try {
 			getConnection().addNode(node);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		/*
 		threadPool.submit(new Runnable() {
 
@@ -575,8 +597,8 @@ public class OSMScanner {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, NumberFormatException, InstantiationException, IllegalAccessException{
 		OSMScanner reader = new OSMScanner();
-		reader.read();
-		//reader.readPlain();
+		//reader.read();
+		reader.readPlain();
 		System.out.println(reader.getTotalBytesRead() + " bytes read");
 	}
 
