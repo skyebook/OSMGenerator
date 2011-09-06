@@ -137,7 +137,7 @@ public class DBActions {
 			bulkInsertNode.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertNode.setLocalInfileInputStream(is);
 
-			bulkInsertNode.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE nodes FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, latitude, longitude, tags)");
+			bulkInsertNode.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE nodes FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, latitude, longitude)");
 
 			bulkInsertNode.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertNodeBuilder = null;
@@ -171,7 +171,7 @@ public class DBActions {
 			bulkInsertWay.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertWay.setLocalInfileInputStream(is);
 
-			bulkInsertWay.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE ways FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, tags)");
+			bulkInsertWay.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE ways FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id)");
 
 			bulkInsertWay.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertWayBuilder = null;
@@ -222,7 +222,7 @@ public class DBActions {
 			bulkInsertRelation.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertRelation.setLocalInfileInputStream(is);
 
-			bulkInsertRelation.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relations FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id, tags)");
+			bulkInsertRelation.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relations FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (id)");
 
 			bulkInsertRelation.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertRelationBuilder=null;
