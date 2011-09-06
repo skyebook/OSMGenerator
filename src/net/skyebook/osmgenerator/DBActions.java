@@ -419,6 +419,13 @@ public class DBActions {
 		for(RelationMemeber rm : relation.getMemebers()){
 			addRelationMember(relation.getId(), rm);
 		}
+		
+		// do nothing if there are no tags
+		if(relation.getTags()!=null){
+			for(AbstractTag tag : relation.getTags()){
+				addRelationTag(relation.getId(), tag);
+			}
+		}
 
 		busy.set(false);
 	}
