@@ -203,7 +203,7 @@ public class DBActions {
 			bulkInsertWayTag.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertWayTag.setLocalInfileInputStream(is);
 
-			bulkInsertWayTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, k, v)");
+			bulkInsertWayTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (way, k, v)");
 
 			bulkInsertWayTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertWayTagBuilder = null;
@@ -263,7 +263,7 @@ public class DBActions {
 			bulkInsertRelationTag.execute("SET UNIQUE_CHECKS=0; ");
 			bulkInsertRelationTag.setLocalInfileInputStream(is);
 
-			bulkInsertRelationTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relation_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (node, k, v)");
+			bulkInsertRelationTag.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE relation_tags FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (relation, k, v)");
 
 			bulkInsertRelationTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertRelationTagBuilder = null;
