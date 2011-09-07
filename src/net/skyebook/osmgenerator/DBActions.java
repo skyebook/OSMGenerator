@@ -225,7 +225,7 @@ public class DBActions {
 
 			bulkInsertWayMember.execute("LOAD DATA LOCAL INFILE 'file.txt' INTO TABLE way_members FIELDS TERMINATED BY '"+BULK_DELIMITER+"' (way, node)");
 
-			bulkInsertWayMember.execute("SET UNIQUE_CHEmysqlCKS=1; ");
+			bulkInsertWayMember.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertWayMemberBuilder=null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
