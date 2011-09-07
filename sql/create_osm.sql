@@ -61,8 +61,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `osm`.`node_tags` (
   `node` BIGINT UNSIGNED NOT NULL ,
-  `key` VARCHAR(255) NOT NULL ,
-  `value` VARCHAR(255) NOT NULL ,
+  `k` VARCHAR(255) NOT NULL ,
+  `v` VARCHAR(255) NOT NULL ,
   INDEX `fk_node_keys_1` (`node` ASC) ,
   CONSTRAINT `fk_node_keys_1`
     FOREIGN KEY (`node` )
@@ -79,8 +79,8 @@ COLLATE = utf8_general_ci;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `osm`.`way_tags` (
   `way` BIGINT UNSIGNED NOT NULL ,
-  `key` VARCHAR(255) NOT NULL ,
-  `value` VARCHAR(255) NOT NULL ,
+  `k` VARCHAR(255) NOT NULL ,
+  `v` VARCHAR(255) NOT NULL ,
   INDEX `fk_way_keys_1` (`way` ASC) ,
   CONSTRAINT `fk_way_keys_1`
     FOREIGN KEY (`way` )
@@ -97,8 +97,8 @@ COLLATE = utf8_general_ci;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `osm`.`relation_tags` (
   `relation` BIGINT UNSIGNED NOT NULL ,
-  `key` VARCHAR(255) NOT NULL ,
-  `value` VARCHAR(255) NOT NULL ,
+  `k` VARCHAR(255) NOT NULL ,
+  `v` VARCHAR(255) NOT NULL ,
   INDEX `fk_relation_keys_1` (`relation` ASC) ,
   CONSTRAINT `fk_relation_keys_1`
     FOREIGN KEY (`relation` )
