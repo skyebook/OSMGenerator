@@ -141,6 +141,9 @@ public class DBActions {
 
 			bulkInsertNode.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertNodeBuilder = null;
+			
+			// reset the buffer size
+			insertNodeBufferSize=0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -161,6 +164,9 @@ public class DBActions {
 
 			bulkInsertNodeTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertNodeTagBuilder = null;
+			
+			// reset the buffer size
+			insertNodeTagBufferSize=0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -178,6 +184,9 @@ public class DBActions {
 
 			bulkInsertWay.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertWayBuilder = null;
+			
+			// reset the buffer size
+			insertWayBufferSize=0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -198,6 +207,9 @@ public class DBActions {
 
 			bulkInsertWayTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertWayTagBuilder = null;
+			
+			// reset the buffer size
+			insertWayTagBufferSize=0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -232,6 +244,9 @@ public class DBActions {
 
 			bulkInsertRelation.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertRelationBuilder=null;
+			
+			// reset the buffer size
+			insertRelationBufferSize=0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -252,6 +267,9 @@ public class DBActions {
 
 			bulkInsertRelationTag.execute("SET UNIQUE_CHECKS=1; ");
 			bulkInsertRelationTagBuilder = null;
+			
+			// reset the buffer size
+			insertRelationTagBufferSize=0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -294,9 +312,6 @@ public class DBActions {
 		if(insertNodeBufferSize==bufferSizeLimit){
 			// execute the insert
 			pushBulkNodes();
-
-			// reset the buffer size
-			insertNodeBufferSize=0;
 		}
 		else{
 			// if this wans't the final node in the buffer, add a newline
@@ -328,9 +343,6 @@ public class DBActions {
 		if(insertNodeTagBufferSize==bufferSizeLimit){
 			// execute the insert
 			pushBulkNodeTags();
-
-			// reset the buffer size
-			insertNodeTagBufferSize=0;
 		}
 		else{
 			// if this wans't the final node in the buffer, add a newline
@@ -353,9 +365,6 @@ public class DBActions {
 		if(insertWayBufferSize==(bufferSizeLimit*smallTableMultiple)){
 			// execute the insert
 			pushBulkWays();
-
-			// reset the buffer size
-			insertWayBufferSize=0;
 		}
 		else{
 			// if this wans't the final way in the buffer, add a newline
@@ -391,9 +400,6 @@ public class DBActions {
 		if(insertWayTagBufferSize==bufferSizeLimit){
 			// execute the insert
 			pushBulkWayTags();
-
-			// reset the buffer size
-			insertWayTagBufferSize=0;
 		}
 		else{
 			// if this wans't the final way in the buffer, add a newline
@@ -416,9 +422,6 @@ public class DBActions {
 		if(insertRelationBufferSize==(bufferSizeLimit*smallTableMultiple)){
 			// execute the insert
 			pushBulkRelations();
-
-			// reset the buffer size
-			insertRelationBufferSize=0;
 		}
 		else{
 			// if this wans't the final relation in the buffer, add a newline
@@ -454,9 +457,6 @@ public class DBActions {
 		if(insertRelationTagBufferSize==bufferSizeLimit){
 			// execute the insert
 			pushBulkRelationTags();
-
-			// reset the buffer size
-			insertRelationTagBufferSize=0;
 		}
 		else{
 			// if this wans't the final Relation in the buffer, add a newline
