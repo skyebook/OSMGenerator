@@ -148,6 +148,9 @@ public class DBActions {
 	}
 	
 	private void pushBulkNodeTags(){
+		
+		pushBulkNodes();
+		
 		if(bulkInsertNodeTagBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertNodeTagBuilder.toString());
@@ -182,6 +185,9 @@ public class DBActions {
 	}
 	
 	private void pushBulkWayTags(){
+		
+		pushBulkWays();
+		
 		if(bulkInsertWayTagBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertWayTagBuilder.toString());
@@ -233,6 +239,9 @@ public class DBActions {
 	}
 	
 	private void pushBulkRelationTags(){
+		
+		pushBulkRelations();
+		
 		if(bulkInsertRelationTagBuilder == null) return;
 		try {
 			InputStream is = IOUtils.toInputStream(bulkInsertRelationTagBuilder.toString());
